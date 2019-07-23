@@ -500,6 +500,41 @@ void database_update_scene_name_by_id(database_T* database, const char* id, cons
 	sqlite3_close(database->db);
 }
 
+dynamic_list_T* database_get_all_scenes(database_T* database)
+{
+    dynamic_list_T* database_scenes = init_dynamic_list(sizeof(struct DATABASE_SCENE_STRUCT*));
+
+    char* sql = "SELECT * FROM scenes";
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
+
+    while (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        const char* id = sqlite3_column_text(stmt, 0);
+        const unsigned char* name = sqlite3_column_text(stmt, 1);;
+        unsigned int main = sqlite3_column_int(stmt, 5);
+
+        char* id_new = calloc(strlen(id) + 1, sizeof(char));
+        strcpy(id_new, id);
+        
+        char* name_new = calloc(strlen(name) + 1, sizeof(char));
+        strcpy(name_new, name);
+
+        database_scene_T* database_scene = init_database_scene(
+            id_new,
+            name_new,
+            main            
+        );
+
+        dynamic_list_append(database_scenes, database_scene);
+	}
+
+    sqlite3_finalize(stmt);
+	sqlite3_close(database->db);
+
+    return database_scenes;
+}
+
 database_actor_instance_T* init_database_actor_instance(
     char* id,
     char* actor_definition_id,
@@ -552,4 +587,52 @@ char* database_insert_actor_instance(
     free(sql);
 
     return id;
+}
+
+dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* database, const char* scene_id)
+{
+    dynamic_list_T* database_actor_instances = init_dynamic_list(sizeof(struct DATABASE_ACTOR_INSTANCE_STRUCT*));
+    
+    //"CREATE TABLE IF NOT EXISTS actor_instances(id TEXT, actor_definition_id TEXT, x FLOAT, y FLOAT, z FLOAT, scene_id TEXT);"
+
+    char* sql_template = "SELECT * FROM actor_instances WHERE scene_id=\"%s\"";
+    char* sql = calloc(strlen(sql_template) + strlen(scene_id) + 1, sizeof(char));
+    sprintf(sql, sql_template, scene_id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
+
+    while (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        const unsigned char* id = sqlite3_column_text(stmt, 0);
+        const unsigned char* actor_definition_id = sqlite3_column_text(stmt, 1);
+        const float x = sqlite3_column_double(stmt, 2);
+        const float y = sqlite3_column_double(stmt, 3);
+        const float z = sqlite3_column_double(stmt, 4);
+
+        char* id_new = calloc(strlen(id) + 1, sizeof(char));
+        strcpy(id_new, id);
+        
+        char* actor_definition_id_new = calloc(strlen(actor_definition_id) + 1, sizeof(char));
+        strcpy(actor_definition_id_new, actor_definition_id);
+
+        char* scene_id_new = calloc(strlen(scene_id) + 1, sizeof(char));
+        strcpy(scene_id_new, scene_id);
+
+        database_actor_instance_T* database_actor_instance = init_database_actor_instance(
+            id_new,
+            actor_definition_id_new,
+            scene_id_new,
+            x,
+            y,
+            z,
+            database_get_actor_definition_by_id(database, actor_definition_id)
+        );
+
+        dynamic_list_append(database_actor_instances, database_actor_instance);
+	}
+
+    sqlite3_finalize(stmt);
+	sqlite3_close(database->db);
+
+    return database_actor_instances;
 }

@@ -102,6 +102,8 @@ void database_delete_scene_by_id(database_T* database, const char* id);
 
 void database_update_scene_name_by_id(database_T* database, const char* id, const char* name);
 
+dynamic_list_T* database_get_all_scenes(database_T* database);
+
 typedef struct DATABASE_ACTOR_INSTANCE_STRUCT
 {
     char* id;
@@ -135,4 +137,6 @@ char* database_insert_actor_instance(
     const float y,
     const float z
 );
+
+dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* database, const char* scene_id);
 #endif
