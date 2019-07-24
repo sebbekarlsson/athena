@@ -364,9 +364,10 @@ void database_update_actor_definition_by_id(
         " WHERE id=\"%s\";";
 
     char* sql = calloc(
-        strlen(sql_template) + strlen(id) + strlen(name) + strlen(tick_script) + strlen(draw_script) + 1,
+        strlen(sql_template) + strlen(id) + strlen(name) + strlen(tick_script) + strlen(draw_script) + 128,
         sizeof(char)
     );
+
     sprintf(sql, sql_template, name, sprite_id, tick_script, draw_script, id);
 
     sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
@@ -380,6 +381,7 @@ void database_update_actor_definition_by_id(
 
 	sqlite3_finalize(stmt);
 	sqlite3_close(database->db);
+    free(sql);
 }
 
 database_scene_T* init_database_scene(char* id, char* name, unsigned int main)
