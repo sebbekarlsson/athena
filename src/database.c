@@ -638,3 +638,27 @@ dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* databas
 
     return database_actor_instances;
 }
+
+unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id)
+{
+    const char* sql_template = "SELECT count(*) FROM actor_instances WHERE scene_id=\"%s\"";
+    char* sql = calloc(1, (strlen(sql_template) + strlen(scene_id) + 1) * sizeof(char));
+
+    sprintf(sql, sql_template, scene_id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
+
+    unsigned int count = 0;
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        count = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+	sqlite3_close(database->db);
+
+    free(sql);
+
+    return count;
+}
