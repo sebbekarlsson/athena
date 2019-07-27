@@ -347,6 +347,56 @@ database_actor_definition_T* database_get_actor_definition_by_id(database_T* dat
     );
 }
 
+database_actor_definition_T* database_get_actor_definition_by_name(database_T* database, const char* name)
+{
+    char* sql_template = "SELECT * FROM actor_definitions WHERE name=\"%s\" LIMIT 1";
+    char* sql = calloc(strlen(sql_template) + strlen(name) + 1, sizeof(char));
+    sprintf(sql, sql_template, name);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
+    free(sql);
+
+    const unsigned char* id = 0;
+    const unsigned char* sprite_id = 0;
+    const unsigned char* tick_script = 0;
+    const unsigned char* draw_script = 0;
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        id = sqlite3_column_text(stmt, 0);
+        tick_script = sqlite3_column_text(stmt, 2);
+        draw_script = sqlite3_column_text(stmt, 3);
+        sprite_id = sqlite3_column_text(stmt, 4);
+	}	
+
+    char* id_new = calloc(strlen(id) + 1, sizeof(char));
+    strcpy(id_new, id);
+    
+    char* name_new = calloc(strlen(name) + 1, sizeof(char));
+    strcpy(name_new, name);
+
+    char* sprite_id_new = calloc(strlen(sprite_id) + 1, sizeof(char));
+    strcpy(sprite_id_new, sprite_id);
+
+    char* tick_script_new = calloc(strlen(tick_script) + 1, sizeof(char));
+    strcpy(tick_script_new, tick_script);
+
+    char* draw_script_new = calloc(strlen(draw_script) + 1, sizeof(char));
+    strcpy(draw_script_new, draw_script);
+
+    sqlite3_finalize(stmt);
+	sqlite3_close(database->db);
+
+    return init_database_actor_definition(
+        id_new,
+        name_new,
+        sprite_id_new,
+        tick_script_new,
+        draw_script_new,
+        database_get_sprite_by_id(database, sprite_id_new)
+    );
+}
+
 void database_update_actor_definition_by_id(
     database_T* database,
     const char* id,

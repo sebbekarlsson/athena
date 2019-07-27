@@ -70,6 +70,8 @@ char* database_insert_actor_definition(
 
 database_actor_definition_T* database_get_actor_definition_by_id(database_T* database, const char* id);
 
+database_actor_definition_T* database_get_actor_definition_by_name(database_T* database, const char* name);
+
 void database_update_actor_definition_by_id(
     database_T* database,
     const char* id,
