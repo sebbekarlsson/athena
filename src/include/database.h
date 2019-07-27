@@ -26,6 +26,7 @@ typedef struct DATABASE_ACTOR_DEFINITION_STRUCT
     char* id;
     char* name;
     char* sprite_id;
+    char* init_script;
     char* tick_script;
     char* draw_script;
     database_sprite_T* database_sprite;
@@ -37,6 +38,7 @@ database_actor_definition_T* init_database_actor_definition(
     char* id,
     char* name,
     char* sprite_id,
+    char* init_script,
     char* tick_script,
     char* draw_script,
     database_sprite_T* database_sprite 
@@ -64,6 +66,7 @@ char* database_insert_actor_definition(
     database_T* database,
     const char* name,
     const char* sprite_id,
+    const char* init_script,
     const char* tick_script,
     const char* draw_script
 );
@@ -77,6 +80,7 @@ void database_update_actor_definition_by_id(
     const char* id,
     const char* name,
     const char* sprite_id,
+    const char* init_script,
     const char* tick_script,
     const char* draw_script
 );
@@ -102,9 +106,11 @@ char* database_insert_scene(database_T* database, const char* name, unsigned int
 
 void database_delete_scene_by_id(database_T* database, const char* id);
 
-void database_update_scene_name_by_id(database_T* database, const char* id, const char* name);
+void database_update_scene_by_id(database_T* database, const char* id, const char* name, unsigned int main);
 
 dynamic_list_T* database_get_all_scenes(database_T* database);
+
+void database_unset_main_flag_on_all_scenes(database_T* database);
 
 typedef struct DATABASE_ACTOR_INSTANCE_STRUCT
 {
