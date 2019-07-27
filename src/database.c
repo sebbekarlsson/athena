@@ -177,7 +177,7 @@ sqlite3_stmt* database_exec_sql(database_T* database, char* sql, unsigned int do
 char* database_insert_sprite(database_T* database, const char* name, sprite_T* sprite)
 {
     char* id = get_random_string(16);
-    char* sql_template = "INSERT INTO sprites VALUES(\"%s\", \"%s\", \"%s\")";
+    char* sql_template = "INSERT INTO sprites VALUES(\'%s\', \'%s\', \'%s\')";
     char* sql = calloc(300, sizeof(char));
 
     char* filepath = calloc(strlen("sprites/") + strlen(name) + strlen(".bin"), sizeof(char));
@@ -224,7 +224,7 @@ char* database_insert_sprite(database_T* database, const char* name, sprite_T* s
 
 void database_update_sprite_name_by_id(database_T* database, const char* id, const char* name)
 {
-    char* sql_template = "UPDATE sprites SET name=\"%s\" WHERE id=\"%s\"";
+    char* sql_template = "UPDATE sprites SET name=\'%s\' WHERE id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(id) + strlen(name) + 1, sizeof(char));
     sprintf(sql, sql_template, name, id);
 
@@ -243,7 +243,7 @@ void database_update_sprite_name_by_id(database_T* database, const char* id, con
 
 database_sprite_T* database_get_sprite_by_id(database_T* database, const char* id)
 {
-    char* sql_template = "SELECT * FROM sprites WHERE id=\"%s\" LIMIT 1";
+    char* sql_template = "SELECT * FROM sprites WHERE id=\'%s\' LIMIT 1";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
     sprintf(sql, sql_template, id);
 
@@ -288,7 +288,7 @@ char* database_insert_actor_definition(
 )
 {
     char* id = get_random_string(16);
-    char* sql_template = "INSERT INTO actor_definitions VALUES(\"%s\", \"%s\", \"%s\", \"%s\", \"%s\", \"%s\")";
+    char* sql_template = "INSERT INTO actor_definitions VALUES(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\')";
     char* sql = calloc(600, sizeof(char));
 
     sprintf(sql, sql_template, id, name, init_script, tick_script, draw_script, sprite_id);
@@ -303,7 +303,7 @@ char* database_insert_actor_definition(
 
 database_actor_definition_T* database_get_actor_definition_by_id(database_T* database, const char* id)
 {
-    char* sql_template = "SELECT * FROM actor_definitions WHERE id=\"%s\" LIMIT 1";
+    char* sql_template = "SELECT * FROM actor_definitions WHERE id=\'%s\' LIMIT 1";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
     sprintf(sql, sql_template, id);
 
@@ -359,7 +359,7 @@ database_actor_definition_T* database_get_actor_definition_by_id(database_T* dat
 
 database_actor_definition_T* database_get_actor_definition_by_name(database_T* database, const char* name)
 {
-    char* sql_template = "SELECT * FROM actor_definitions WHERE name=\"%s\" LIMIT 1";
+    char* sql_template = "SELECT * FROM actor_definitions WHERE name=\'%s\' LIMIT 1";
     char* sql = calloc(strlen(sql_template) + strlen(name) + 1, sizeof(char));
     sprintf(sql, sql_template, name);
 
@@ -424,12 +424,12 @@ void database_update_actor_definition_by_id(
 )
 {
     char* sql_template = 
-        "UPDATE actor_definitions SET name=\"%s\","
-        " sprite_id=\"%s\","
-        " init_script=\"%s\","
-        " tick_script=\"%s\","
-        " draw_script=\"%s\""
-        " WHERE id=\"%s\";";
+        "UPDATE actor_definitions SET name=\'%s\',"
+        " sprite_id=\'%s\',"
+        " init_script=\'%s\',"
+        " tick_script=\'%s\',"
+        " draw_script=\'%s\'"
+        " WHERE id=\'%s\';";
 
     char* sql = calloc(
         strlen(sql_template) + strlen(id) + strlen(name) + strlen(init_script) + strlen(tick_script) + strlen(draw_script) + 128,
@@ -471,7 +471,7 @@ void database_scene_free(database_scene_T* database_scene)
 
 database_scene_T* database_get_scene_by_id(database_T* database, const char* id)
 {
-    char* sql_template = "SELECT * FROM scenes WHERE id=\"%s\" LIMIT 1";
+    char* sql_template = "SELECT * FROM scenes WHERE id=\'%s\' LIMIT 1";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
     sprintf(sql, sql_template, id);
 
@@ -525,7 +525,7 @@ unsigned int database_count_scenes(database_T* database)
 char* database_insert_scene(database_T* database, const char* name, unsigned int main)
 {
     char* id = get_random_string(16);
-    char* sql_template = "INSERT INTO scenes VALUES(\"%s\", \"%s\", 255, 255, 255, %d)";
+    char* sql_template = "INSERT INTO scenes VALUES(\'%s\', \'%s\', 255, 255, 255, %d)";
     char* sql = calloc(400, sizeof(char));
 
     sprintf(sql, sql_template, id, name, main);
@@ -540,7 +540,7 @@ char* database_insert_scene(database_T* database, const char* name, unsigned int
 
 void database_delete_scene_by_id(database_T* database, const char* id)
 {
-    char* sql_template = "DELETE * FROM scenes WHERE id=\"%s\"";
+    char* sql_template = "DELETE * FROM scenes WHERE id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
 
     sprintf(sql, sql_template, id);
@@ -553,7 +553,7 @@ void database_delete_scene_by_id(database_T* database, const char* id)
 
 void database_update_scene_by_id(database_T* database, const char* id, const char* name, unsigned int main)
 {
-    char* sql_template = "UPDATE scenes SET name=\"%s\", main=%d WHERE id=\"%s\"";
+    char* sql_template = "UPDATE scenes SET name=\'%s\', main=%d WHERE id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(id) + strlen(name) + 128, sizeof(char));
     sprintf(sql, sql_template, name, main, id);
 
@@ -663,7 +663,7 @@ char* database_insert_actor_instance(
 )
 {
     char* id = get_random_string(16);
-    char* sql_template = "INSERT INTO actor_instances VALUES(\"%s\", \"%s\", %12.6f, %12.6f, %12.6f, \"%s\")";
+    char* sql_template = "INSERT INTO actor_instances VALUES(\'%s\', \'%s\', %12.6f, %12.6f, %12.6f, \'%s\')";
     char* sql = calloc(400, sizeof(char));
 
     sprintf(sql, sql_template, id, actor_definition_id, x, y, z, scene_id);
@@ -680,9 +680,7 @@ dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* databas
 {
     dynamic_list_T* database_actor_instances = init_dynamic_list(sizeof(struct DATABASE_ACTOR_INSTANCE_STRUCT*));
     
-    //"CREATE TABLE IF NOT EXISTS actor_instances(id TEXT, actor_definition_id TEXT, x FLOAT, y FLOAT, z FLOAT, scene_id TEXT);"
-
-    char* sql_template = "SELECT * FROM actor_instances WHERE scene_id=\"%s\"";
+    char* sql_template = "SELECT * FROM actor_instances WHERE scene_id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(scene_id) + 1, sizeof(char));
     sprintf(sql, sql_template, scene_id);
 
@@ -726,7 +724,7 @@ dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* databas
 
 unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id)
 {
-    const char* sql_template = "SELECT count(*) FROM actor_instances WHERE scene_id=\"%s\"";
+    const char* sql_template = "SELECT count(*) FROM actor_instances WHERE scene_id=\'%s\'";
     char* sql = calloc(1, (strlen(sql_template) + strlen(scene_id) + 1) * sizeof(char));
 
     sprintf(sql, sql_template, scene_id);
