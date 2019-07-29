@@ -148,5 +148,7 @@ char* database_insert_actor_instance(
 
 dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* database, const char* scene_id);
 
+void database_delete_actor_instance_by_id(database_T* database, const char* id);
+
 unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id);
 #endif
