@@ -62,6 +62,8 @@ void database_update_sprite_name_by_id(database_T* database, const char* id, con
 
 database_sprite_T* database_get_sprite_by_id(database_T* database, const char* id);
 
+void database_delete_sprite_by_id(database_T* database, const char* id);
+
 char* database_insert_actor_definition(
     database_T* database,
     const char* name,
@@ -84,6 +86,8 @@ void database_update_actor_definition_by_id(
     const char* tick_script,
     const char* draw_script
 );
+
+void database_delete_actor_definition_by_id(database_T* database, const char* id);
 
 typedef struct DATABASE_SCENE_STRUCT
 {
@@ -149,6 +153,8 @@ char* database_insert_actor_instance(
 dynamic_list_T* database_get_all_actor_instances_by_scene_id(database_T* database, const char* scene_id);
 
 void database_delete_actor_instance_by_id(database_T* database, const char* id);
+
+void database_delete_actor_instances_by_actor_definition_id(database_T* database, const char* id);
 
 unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id);
 #endif

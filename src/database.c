@@ -1,4 +1,5 @@
 #include "include/database.h"
+#include "include/file_utils.h"
 #include <coelum/file_utils.h>
 #include <string.h>
 #include <coelum/actor.h>
@@ -89,7 +90,9 @@ database_sprite_T* init_database_sprite(char* id, char* name, char* filepath, sp
 
 void database_sprite_free(database_sprite_T* database_sprite)
 {
-    sprite_free(database_sprite->sprite);
+    if (database_sprite->sprite != (void*) 0)
+        sprite_free(database_sprite->sprite);
+
     free(database_sprite);
 }
 
@@ -261,7 +264,11 @@ database_sprite_T* database_get_sprite_by_id(database_T* database, const char* i
 
         if (filepath)
             sprite = load_sprite_from_disk(filepath);
-	}	
+	}
+    else
+    {
+        return (void*) 0;
+    }
 
     char* id_new = calloc(strlen(id) + 1, sizeof(char));
     strcpy(id_new, id);
@@ -276,6 +283,26 @@ database_sprite_T* database_get_sprite_by_id(database_T* database, const char* i
 	sqlite3_close(database->db);
 
     return init_database_sprite(id_new, name_new, filepath_new, sprite);
+}
+
+void database_delete_sprite_by_id(database_T* database, const char* id)
+{
+    database_sprite_T* database_sprite = database_get_sprite_by_id(database, id);
+
+    if (database_sprite->sprite != (void*) 0)
+        delete_file(database_sprite->filepath);
+
+    char* sql_template = "DELETE FROM sprites WHERE id=\'%s\'";
+    char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
+
+    sprintf(sql, sql_template, id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
+    sqlite3_finalize(stmt);
+    sqlite3_close(database->db);
+    free(sql);
+
+    database_sprite_free(database_sprite);
 }
 
 char* database_insert_actor_definition(
@@ -452,6 +479,21 @@ void database_update_actor_definition_by_id(
     free(sql);
 }
 
+void database_delete_actor_definition_by_id(database_T* database, const char* id)
+{
+    database_delete_actor_instances_by_actor_definition_id(database, id);
+
+    char* sql_template = "DELETE FROM actor_definitions WHERE id=\'%s\'";
+    char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
+
+    sprintf(sql, sql_template, id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
+    sqlite3_finalize(stmt);
+    sqlite3_close(database->db);
+    free(sql);
+}
+
 database_scene_T* init_database_scene(char* id, char* name, unsigned int main)
 {
     database_scene_T* database_scene = calloc(1, sizeof(struct DATABASE_SCENE_STRUCT));
@@ -540,7 +582,7 @@ char* database_insert_scene(database_T* database, const char* name, unsigned int
 
 void database_delete_scene_by_id(database_T* database, const char* id)
 {
-    char* sql_template = "DELETE * FROM scenes WHERE id=\'%s\'";
+    char* sql_template = "DELETE FROM scenes WHERE id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
 
     sprintf(sql, sql_template, id);
@@ -729,21 +771,23 @@ void database_delete_actor_instance_by_id(database_T* database, const char* id)
 
     sprintf(sql, sql_template, id);
 
-    sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
-
-    unsigned int count = 0;
-
-    if (sqlite3_step(stmt) != SQLITE_DONE)
-    {
-        count = sqlite3_column_int(stmt, 0);
-    }
-
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
     sqlite3_finalize(stmt);
-	sqlite3_close(database->db);
-
+    sqlite3_close(database->db);
     free(sql);
+}
 
-    return count;
+void database_delete_actor_instances_by_actor_definition_id(database_T* database, const char* id)
+{
+    char* sql_template = "DELETE FROM actor_instances WHERE actor_definition_id=\'%s\'";
+    char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
+
+    sprintf(sql, sql_template, id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
+    sqlite3_finalize(stmt);
+    sqlite3_close(database->db);
+    free(sql);
 }
 
 unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id)
