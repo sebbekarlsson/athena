@@ -582,6 +582,8 @@ char* database_insert_scene(database_T* database, const char* name, unsigned int
 
 void database_delete_scene_by_id(database_T* database, const char* id)
 {
+    database_delete_actor_instances_by_scene_id(database, id);
+
     char* sql_template = "DELETE FROM scenes WHERE id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
 
@@ -780,6 +782,19 @@ void database_delete_actor_instance_by_id(database_T* database, const char* id)
 void database_delete_actor_instances_by_actor_definition_id(database_T* database, const char* id)
 {
     char* sql_template = "DELETE FROM actor_instances WHERE actor_definition_id=\'%s\'";
+    char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
+
+    sprintf(sql, sql_template, id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
+    sqlite3_finalize(stmt);
+    sqlite3_close(database->db);
+    free(sql);
+}
+
+void database_delete_actor_instances_by_scene_id(database_T* database, const char* id)
+{
+    char* sql_template = "DELETE FROM actor_instances WHERE scene_id=\'%s\'";
     char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
 
     sprintf(sql, sql_template, id);

@@ -156,5 +156,7 @@ void database_delete_actor_instance_by_id(database_T* database, const char* id);
 
 void database_delete_actor_instances_by_actor_definition_id(database_T* database, const char* id);
 
+void database_delete_actor_instances_by_scene_id(database_T* database, const char* id);
+
 unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id);
 #endif
