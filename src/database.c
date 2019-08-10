@@ -57,7 +57,8 @@ database_T* init_database()
     char *sql = "CREATE TABLE IF NOT EXISTS actor_definitions(id TEXT, name TEXT, init_script TEXT, tick_script TEXT, draw_script TEXT, sprite_id TEXT);"
                 "CREATE TABLE IF NOT EXISTS actor_instances(id TEXT, actor_definition_id TEXT, x FLOAT, y FLOAT, z FLOAT, scene_id TEXT);"
                 "CREATE TABLE IF NOT EXISTS sprites(id TEXT, name TEXT, filepath TEXT);"
-                "CREATE TABLE IF NOT EXISTS scenes(id TEXT, name TEXT, bg_r INT, bg_g INT, bg_b INT, main INT)";
+                "CREATE TABLE IF NOT EXISTS scenes(id TEXT, name TEXT, bg_r INT, bg_g INT, bg_b INT, main INT);"
+                "CREATE TABLE IF NOT EXISTS scripts(id TEXT, name TEXT, filepath TEXT);";
     
     rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
     
@@ -827,4 +828,87 @@ unsigned int database_count_actors_in_scene(database_T* database, const char* sc
     free(sql);
 
     return count;
+}
+
+database_script_T* init_database_script(char* id, char* name, char* filepath, char* contents)
+{
+    database_script_T* database_script = calloc(1, sizeof(struct DATABASE_SCRIPT_STRUCT));
+    database_script->id = id;
+    database_script->name = name;
+    database_script->filepath = filepath;
+    database_script->contents = contents;
+
+    return database_script;
+}
+
+void database_script_free(database_script_T* database_script)
+{
+    free(database_script->id);
+    free(database_script->name);
+    free(database_script->filepath);
+    // TODO: free database_script->contents
+    
+    free(database_script);
+}
+
+char* database_insert_script(
+    database_T* database,
+    const char* name,
+    const char* filepath
+)
+{
+    char* id = get_random_string(16);
+    char* sql_template = "INSERT INTO scripts VALUES(\'%s\', \'%s\', \'%s\')";
+    char* sql = calloc(400, sizeof(char));
+
+    sprintf(sql, sql_template, id, name, filepath);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
+    sqlite3_finalize(stmt);
+    sqlite3_close(database->db);
+    free(sql);
+
+    return id;
+}
+
+database_script_T* database_get_script_by_id(database_T* database, const char* id)
+{
+    char* sql_template = "SELECT * FROM scripts WHERE id=\'%s\' LIMIT 1";
+    char* sql = calloc(strlen(sql_template) + strlen(id) + 1, sizeof(char));
+    sprintf(sql, sql_template, id);
+
+    sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
+    free(sql);
+
+    const unsigned char* name = 0;
+    const unsigned char* filepath = 0;
+    char* contents;
+
+    if (sqlite3_step(stmt) != SQLITE_DONE)
+    {
+        name = sqlite3_column_text(stmt, 1);
+        filepath = sqlite3_column_text(stmt, 2);
+
+        // TODO:
+        // load contents from disk
+        contents = (void*) 0;
+	}
+    else
+    {
+        return (void*) 0;
+    }
+
+    char* id_new = calloc(strlen(id) + 1, sizeof(char));
+    strcpy(id_new, id);
+
+    char* name_new = calloc(strlen(name) + 1, sizeof(char));
+    strcpy(name_new, name);
+
+    char* filepath_new = calloc(strlen(filepath) + 1, sizeof(char));
+    strcpy(filepath_new, filepath);
+
+    sqlite3_finalize(stmt);
+	sqlite3_close(database->db);
+
+    return init_database_script(id_new, name_new, filepath_new, contents);
 }

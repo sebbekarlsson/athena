@@ -159,4 +159,25 @@ void database_delete_actor_instances_by_actor_definition_id(database_T* database
 void database_delete_actor_instances_by_scene_id(database_T* database, const char* id);
 
 unsigned int database_count_actors_in_scene(database_T* database, const char* scene_id);
+
+
+typedef struct DATABASE_SCRIPT_STRUCT
+{
+    char* id;
+    char* name;
+    char* filepath;
+    char* contents;
+} database_script_T;
+
+database_script_T* init_database_script(char* id, char* name, char* filepath, char* contents);
+
+void database_script_free(database_script_T* database_script);
+
+char* database_insert_script(
+    database_T* database,
+    const char* name,
+    const char* filepath
+);
+
+database_script_T* database_get_script_by_id(database_T* database, const char* id);
 #endif
