@@ -1,6 +1,7 @@
 #include "include/database.h"
 #include "include/file_utils.h"
 #include <coelum/file_utils.h>
+#include <coelum/io.h>
 #include <string.h>
 #include <coelum/actor.h>
 #include <spr/spr.h>
@@ -888,10 +889,7 @@ database_script_T* database_get_script_by_id(database_T* database, const char* i
     {
         name = sqlite3_column_text(stmt, 1);
         filepath = sqlite3_column_text(stmt, 2);
-
-        // TODO:
-        // load contents from disk
-        contents = (void*) 0;
+        contents = read_file(filepath);
 	}
     else
     {
