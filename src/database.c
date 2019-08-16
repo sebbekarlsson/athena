@@ -363,14 +363,29 @@ database_actor_definition_T* database_get_actor_definition_by_id(database_T* dat
     char* sprite_id_new = calloc(strlen(sprite_id) + 1, sizeof(char));
     strcpy(sprite_id_new, sprite_id);
 
-    char* init_script_id_new = calloc(strlen(init_script_id) + 1, sizeof(char));
-    strcpy(init_script_id_new, init_script_id);
-    
-    char* tick_script_id_new = calloc(strlen(tick_script_id) + 1, sizeof(char));
-    strcpy(tick_script_id_new, tick_script_id);
+    char* init_script_id_new = (void*)0;
 
-    char* draw_script_id_new = calloc(strlen(draw_script_id) + 1, sizeof(char));
-    strcpy(draw_script_id_new, draw_script_id);
+    if (strlen(init_script_id))
+    {
+        init_script_id_new = calloc(strlen(init_script_id) + 1, sizeof(char));
+        strcpy(init_script_id_new, init_script_id);
+    }
+    
+    char* tick_script_id_new = (void*)0;
+
+    if (strlen(tick_script_id))
+    {
+        tick_script_id_new = calloc(strlen(tick_script_id) + 1, sizeof(char));
+        strcpy(tick_script_id_new, tick_script_id);
+    }
+
+    char* draw_script_id_new = (void*)0;
+
+    if (strlen(draw_script_id))
+    {
+        draw_script_id_new = calloc(strlen(draw_script_id) + 1, sizeof(char));
+        strcpy(draw_script_id_new, draw_script_id);
+    }
 
     sqlite3_finalize(stmt);
 	sqlite3_close(database->db);
@@ -419,14 +434,29 @@ database_actor_definition_T* database_get_actor_definition_by_name(database_T* d
     char* sprite_id_new = calloc(strlen(sprite_id) + 1, sizeof(char));
     strcpy(sprite_id_new, sprite_id);
 
-    char* init_script_id_new = calloc(strlen(init_script_id) + 1, sizeof(char));
-    strcpy(init_script_id_new, tick_script_id);
+    char* init_script_id_new = (void*)0;
 
-    char* tick_script_id_new = calloc(strlen(tick_script_id) + 1, sizeof(char));
-    strcpy(tick_script_id_new, tick_script_id);
+    if (strlen(init_script_id))
+    {
+        init_script_id_new = calloc(strlen(init_script_id) + 1, sizeof(char));
+        strcpy(init_script_id_new, init_script_id);
+    }
+    
+    char* tick_script_id_new = (void*)0;
 
-    char* draw_script_id_new = calloc(strlen(draw_script_id) + 1, sizeof(char));
-    strcpy(draw_script_id_new, draw_script_id);
+    if (strlen(tick_script_id))
+    {
+        tick_script_id_new = calloc(strlen(tick_script_id) + 1, sizeof(char));
+        strcpy(tick_script_id_new, tick_script_id);
+    }
+
+    char* draw_script_id_new = (void*)0;
+
+    if (strlen(draw_script_id))
+    {
+        draw_script_id_new = calloc(strlen(draw_script_id) + 1, sizeof(char));
+        strcpy(draw_script_id_new, draw_script_id);
+    }
 
     sqlite3_finalize(stmt);
 	sqlite3_close(database->db);
