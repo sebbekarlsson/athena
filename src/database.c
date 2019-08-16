@@ -473,7 +473,6 @@ void database_update_actor_definition_by_id(
     if (draw_script_id != (void*) 0)
         draw_script_id_len = strlen(draw_script_id);
 
-    printf("BEFORE\n");
     char* sql = calloc(
         strlen(sql_template) +
         strlen(id) +
@@ -484,7 +483,6 @@ void database_update_actor_definition_by_id(
         128,
         sizeof(char)
     );
-    printf("AFTER\n");
 
     sprintf(
         sql,
