@@ -26,9 +26,9 @@ typedef struct DATABASE_ACTOR_DEFINITION_STRUCT
     char* id;
     char* name;
     char* sprite_id;
-    char* init_script;
-    char* tick_script;
-    char* draw_script;
+    char* init_script_id;
+    char* tick_script_id;
+    char* draw_script_id;
     database_sprite_T* database_sprite;
 
     // TODO: add friction
@@ -38,9 +38,9 @@ database_actor_definition_T* init_database_actor_definition(
     char* id,
     char* name,
     char* sprite_id,
-    char* init_script,
-    char* tick_script,
-    char* draw_script,
+    char* init_script_id,
+    char* tick_script_id,
+    char* draw_script_id,
     database_sprite_T* database_sprite 
 );
 
@@ -68,9 +68,9 @@ char* database_insert_actor_definition(
     database_T* database,
     const char* name,
     const char* sprite_id,
-    const char* init_script,
-    const char* tick_script,
-    const char* draw_script
+    const char* init_script_id,
+    const char* tick_script_id,
+    const char* draw_script_id
 );
 
 database_actor_definition_T* database_get_actor_definition_by_id(database_T* database, const char* id);
@@ -82,9 +82,9 @@ void database_update_actor_definition_by_id(
     const char* id,
     const char* name,
     const char* sprite_id,
-    const char* init_script,
-    const char* tick_script,
-    const char* draw_script
+    const char* init_script_id,
+    const char* tick_script_id,
+    const char* draw_script_id
 );
 
 void database_delete_actor_definition_by_id(database_T* database, const char* id);

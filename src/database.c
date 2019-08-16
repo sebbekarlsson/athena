@@ -55,7 +55,7 @@ database_T* init_database()
         return database;
     }
 
-    char *sql = "CREATE TABLE IF NOT EXISTS actor_definitions(id TEXT, name TEXT, init_script TEXT, tick_script TEXT, draw_script TEXT, sprite_id TEXT);"
+    char *sql = "CREATE TABLE IF NOT EXISTS actor_definitions(id TEXT, name TEXT, init_script_id TEXT, tick_script_id TEXT, draw_script_id TEXT, sprite_id TEXT);"
                 "CREATE TABLE IF NOT EXISTS actor_instances(id TEXT, actor_definition_id TEXT, x FLOAT, y FLOAT, z FLOAT, scene_id TEXT);"
                 "CREATE TABLE IF NOT EXISTS sprites(id TEXT, name TEXT, filepath TEXT);"
                 "CREATE TABLE IF NOT EXISTS scenes(id TEXT, name TEXT, bg_r INT, bg_g INT, bg_b INT, main INT);"
@@ -116,9 +116,9 @@ database_actor_definition_T* init_database_actor_definition(
     char* id,
     char* name,
     char* sprite_id,
-    char* init_script,
-    char* tick_script,
-    char* draw_script,
+    char* init_script_id,
+    char* tick_script_id,
+    char* draw_script_id,
     database_sprite_T* database_sprite
 )
 {
@@ -129,9 +129,9 @@ database_actor_definition_T* init_database_actor_definition(
     database_actor_definition->id = id;
     database_actor_definition->name = name;
     database_actor_definition->sprite_id = sprite_id;
-    database_actor_definition->init_script = init_script;
-    database_actor_definition->tick_script = tick_script;
-    database_actor_definition->draw_script = draw_script;
+    database_actor_definition->init_script_id = init_script_id;
+    database_actor_definition->tick_script_id = tick_script_id;
+    database_actor_definition->draw_script_id = draw_script_id;
     database_actor_definition->database_sprite = database_sprite;
 
     return database_actor_definition;
@@ -141,9 +141,9 @@ void database_actor_definition_free(database_actor_definition_T* database_actor_
 {
     free(database_actor_definition->id);
     free(database_actor_definition->sprite_id);
-    free(database_actor_definition->init_script);
-    free(database_actor_definition->tick_script);
-    free(database_actor_definition->draw_script);
+    free(database_actor_definition->init_script_id);
+    free(database_actor_definition->tick_script_id);
+    free(database_actor_definition->draw_script_id);
     database_sprite_free(database_actor_definition->database_sprite);
     free(database_actor_definition);
 }
@@ -311,16 +311,16 @@ char* database_insert_actor_definition(
     database_T* database,
     const char* name,
     const char* sprite_id,
-    const char* init_script,
-    const char* tick_script,
-    const char* draw_script
+    const char* init_script_id,
+    const char* tick_script_id,
+    const char* draw_script_id
 )
 {
     char* id = get_random_string(16);
     char* sql_template = "INSERT INTO actor_definitions VALUES(\'%s\', \'%s\', \'%s\', \'%s\', \'%s\', \'%s\')";
     char* sql = calloc(600, sizeof(char));
 
-    sprintf(sql, sql_template, id, name, init_script, tick_script, draw_script, sprite_id);
+    sprintf(sql, sql_template, id, name, init_script_id, tick_script_id, draw_script_id, sprite_id);
 
     sqlite3_stmt* stmt = database_exec_sql(database, sql, 1);
     sqlite3_finalize(stmt);
@@ -341,16 +341,16 @@ database_actor_definition_T* database_get_actor_definition_by_id(database_T* dat
 
     const unsigned char* name = 0;
     const unsigned char* sprite_id = 0;
-    const unsigned char* init_script = 0;
-    const unsigned char* tick_script = 0;
-    const unsigned char* draw_script = 0;
+    const unsigned char* init_script_id = 0;
+    const unsigned char* tick_script_id = 0;
+    const unsigned char* draw_script_id = 0;
 
     if (sqlite3_step(stmt) != SQLITE_DONE)
     {
         name = sqlite3_column_text(stmt, 1);
-        init_script = sqlite3_column_text(stmt, 2);
-        tick_script = sqlite3_column_text(stmt, 3);
-        draw_script = sqlite3_column_text(stmt, 4);
+        init_script_id = sqlite3_column_text(stmt, 2);
+        tick_script_id = sqlite3_column_text(stmt, 3);
+        draw_script_id = sqlite3_column_text(stmt, 4);
         sprite_id = sqlite3_column_text(stmt, 5);
 	}	
 
@@ -363,14 +363,14 @@ database_actor_definition_T* database_get_actor_definition_by_id(database_T* dat
     char* sprite_id_new = calloc(strlen(sprite_id) + 1, sizeof(char));
     strcpy(sprite_id_new, sprite_id);
 
-    char* init_script_new = calloc(strlen(init_script) + 1, sizeof(char));
-    strcpy(init_script_new, init_script);
+    char* init_script_id_new = calloc(strlen(init_script_id) + 1, sizeof(char));
+    strcpy(init_script_id_new, init_script_id);
     
-    char* tick_script_new = calloc(strlen(tick_script) + 1, sizeof(char));
-    strcpy(tick_script_new, tick_script);
+    char* tick_script_id_new = calloc(strlen(tick_script_id) + 1, sizeof(char));
+    strcpy(tick_script_id_new, tick_script_id);
 
-    char* draw_script_new = calloc(strlen(draw_script) + 1, sizeof(char));
-    strcpy(draw_script_new, draw_script);
+    char* draw_script_id_new = calloc(strlen(draw_script_id) + 1, sizeof(char));
+    strcpy(draw_script_id_new, draw_script_id);
 
     sqlite3_finalize(stmt);
 	sqlite3_close(database->db);
@@ -379,9 +379,9 @@ database_actor_definition_T* database_get_actor_definition_by_id(database_T* dat
         id_new,
         name_new,
         sprite_id_new,
-        init_script_new,
-        tick_script_new,
-        draw_script_new,
+        init_script_id_new,
+        tick_script_id_new,
+        draw_script_id_new,
         database_get_sprite_by_id(database, sprite_id_new)
     );
 }
@@ -397,16 +397,16 @@ database_actor_definition_T* database_get_actor_definition_by_name(database_T* d
 
     const unsigned char* id = 0;
     const unsigned char* sprite_id = 0;
-    const unsigned char* init_script = 0;
-    const unsigned char* tick_script = 0;
-    const unsigned char* draw_script = 0;
+    const unsigned char* init_script_id = 0;
+    const unsigned char* tick_script_id = 0;
+    const unsigned char* draw_script_id = 0;
 
     if (sqlite3_step(stmt) != SQLITE_DONE)
     {
         id = sqlite3_column_text(stmt, 0);
-        init_script = sqlite3_column_text(stmt, 2);
-        tick_script = sqlite3_column_text(stmt, 3);
-        draw_script = sqlite3_column_text(stmt, 4);
+        init_script_id = sqlite3_column_text(stmt, 2);
+        tick_script_id = sqlite3_column_text(stmt, 3);
+        draw_script_id = sqlite3_column_text(stmt, 4);
         sprite_id = sqlite3_column_text(stmt, 5);
 	}	
 
@@ -419,14 +419,14 @@ database_actor_definition_T* database_get_actor_definition_by_name(database_T* d
     char* sprite_id_new = calloc(strlen(sprite_id) + 1, sizeof(char));
     strcpy(sprite_id_new, sprite_id);
 
-    char* init_script_new = calloc(strlen(init_script) + 1, sizeof(char));
-    strcpy(init_script_new, tick_script);
+    char* init_script_id_new = calloc(strlen(init_script_id) + 1, sizeof(char));
+    strcpy(init_script_id_new, tick_script_id);
 
-    char* tick_script_new = calloc(strlen(tick_script) + 1, sizeof(char));
-    strcpy(tick_script_new, tick_script);
+    char* tick_script_id_new = calloc(strlen(tick_script_id) + 1, sizeof(char));
+    strcpy(tick_script_id_new, tick_script_id);
 
-    char* draw_script_new = calloc(strlen(draw_script) + 1, sizeof(char));
-    strcpy(draw_script_new, draw_script);
+    char* draw_script_id_new = calloc(strlen(draw_script_id) + 1, sizeof(char));
+    strcpy(draw_script_id_new, draw_script_id);
 
     sqlite3_finalize(stmt);
 	sqlite3_close(database->db);
@@ -435,9 +435,9 @@ database_actor_definition_T* database_get_actor_definition_by_name(database_T* d
         id_new,
         name_new,
         sprite_id_new,
-        init_script_new,
-        tick_script_new,
-        draw_script_new,
+        init_script_id_new,
+        tick_script_id_new,
+        draw_script_id_new,
         database_get_sprite_by_id(database, sprite_id_new)
     );
 }
@@ -447,25 +447,55 @@ void database_update_actor_definition_by_id(
     const char* id,
     const char* name,
     const char* sprite_id,
-    const char* init_script,
-    const char* tick_script,
-    const char* draw_script
+    const char* init_script_id,
+    const char* tick_script_id,
+    const char* draw_script_id
 )
 {
     char* sql_template = 
         "UPDATE actor_definitions SET name=\'%s\',"
         " sprite_id=\'%s\',"
-        " init_script=\'%s\',"
-        " tick_script=\'%s\',"
-        " draw_script=\'%s\'"
+        " init_script_id=\'%s\',"
+        " tick_script_id=\'%s\',"
+        " draw_script_id=\'%s\'"
         " WHERE id=\'%s\';";
 
+    size_t init_script_id_len = 0;
+    size_t tick_script_id_len = 0;
+    size_t draw_script_id_len = 0;
+
+    if (init_script_id != (void*) 0)
+        init_script_id_len = strlen(init_script_id);
+
+    if (tick_script_id != (void*) 0)
+        tick_script_id_len = strlen(tick_script_id);
+
+    if (draw_script_id != (void*) 0)
+        draw_script_id_len = strlen(draw_script_id);
+
+    printf("BEFORE\n");
     char* sql = calloc(
-        strlen(sql_template) + strlen(id) + strlen(name) + strlen(init_script) + strlen(tick_script) + strlen(draw_script) + 128,
+        strlen(sql_template) +
+        strlen(id) +
+        strlen(name) +
+        init_script_id_len +
+        tick_script_id_len +
+        draw_script_id_len +
+        128,
         sizeof(char)
     );
+    printf("AFTER\n");
 
-    sprintf(sql, sql_template, name, sprite_id, init_script, tick_script, draw_script, id);
+    sprintf(
+        sql,
+        sql_template,
+        name,
+        sprite_id,
+        init_script_id == (void*) 0 ? "" : init_script_id,
+        tick_script_id == (void*) 0 ? "" : tick_script_id,
+        draw_script_id == (void*) 0 ? "" : draw_script_id,
+        id
+    );
 
     sqlite3_stmt* stmt = database_exec_sql(database, sql, 0);
 
